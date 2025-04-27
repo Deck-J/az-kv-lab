@@ -2,37 +2,37 @@ name: Test Unmarshal Accounts JSON
 
 on:
   push:
-    branches:
-      - main
-      - develop    # or whatever branches you care about
-  pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   unmarshal-json:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Restore accounts.json from secret
         run: |
-          printf "%s" "${{ secrets.ACCOUNTS_JSON }}" > accounts.json
-          echo "Wrote accounts.json (size: $(wc -c < accounts.json) bytes)"
+          cat << 'EOF' > accounts.json
+${{ secrets.ACCOUNTS_JSON }}
+EOF
 
       - name: Install jq
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
 
+      - name: Validate JSON with jq
+        run: |
+          echo "Validating accounts.json…"
+          jq . accounts.json
+
       - name: Unmarshal & loop through records
         run: |
           COUNT=$(jq length accounts.json)
           echo "🔢 Found $COUNT records in accounts.json"
-
           for i in $(seq 0 $((COUNT - 1))); do
             DEVICE=$(jq -r ".[$i].deviceName" accounts.json)
             APPID=$(jq -r ".[$i].applicationId" accounts.json)
