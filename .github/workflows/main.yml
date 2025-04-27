@@ -25,9 +25,7 @@ EOF
           sudo apt-get install -y jq
 
       - name: Validate JSON with jq
-        run: |
-          echo "Validating accounts.json…"
-          jq . accounts.json
+        run: jq . accounts.json
 
       - name: Unmarshal & loop through records
         run: |
