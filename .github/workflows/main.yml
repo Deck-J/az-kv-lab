@@ -26,14 +26,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Validate JSON is well-formed
+      - name: Validate JSON & print record count
         shell: bash
         run: |
-          echo "🔍 Checking JSON syntax…"
-          jq -e . accounts.json
-
-      - name: Count records
-        shell: bash
-        run: |
+          # First, count how many records
           COUNT=$(jq length accounts.json)
-          echo "🔢 Found $COUNT records in accounts.json"
+          # Next, validate syntax quietly
+          if jq -e . accounts.json > /dev/null; then
+            echo "🔢 Found $COUNT records in accounts.json"
+          else
+            echo "❌ accounts.json is not valid JSON"
+            exit 1
+          fi
