@@ -17,8 +17,8 @@ jobs:
         shell: bash
         run: |
           cat << 'EOF' > accounts.json
-          ${{ secrets.ACCOUNTS_JSON }}
-          EOF
+${{ secrets.ACCOUNTS_JSON }}
+EOF
 
       - name: Install jq
         shell: bash
@@ -26,20 +26,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Validate JSON with jq
+      - name: Validate JSON is well-formed
         shell: bash
         run: |
-          echo "Validating accounts.json…"
-          jq . accounts.json
+          echo "🔍 Checking JSON syntax…"
+          # -e returns exit code 0 on valid JSON, but prints nothing
+          jq -e . accounts.json
 
-      - name: Unmarshal & loop through records
+      - name: Count records
         shell: bash
         run: |
           COUNT=$(jq length accounts.json)
           echo "🔢 Found $COUNT records in accounts.json"
-          for i in $(seq 0 $((COUNT - 1))); do
-            DEVICE=$(jq -r ".[$i].deviceName" accounts.json)
-            APPID=$(jq -r ".[$i].applicationId" accounts.json)
-            ACCOUNT=$(jq -r ".[$i].accountName" accounts.json)
-            echo "Record #$i → Device: $DEVICE | AppId: $APPID | Account: $ACCOUNT"
-          done
