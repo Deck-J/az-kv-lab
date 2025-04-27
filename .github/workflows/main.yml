@@ -17,8 +17,8 @@ jobs:
         shell: bash
         run: |
           cat << 'EOF' > accounts.json
-${{ secrets.ACCOUNTS_JSON }}
-EOF
+          ${{ secrets.ACCOUNTS_JSON }}
+          EOF
 
       - name: Install jq
         shell: bash
@@ -30,7 +30,6 @@ EOF
         shell: bash
         run: |
           echo "🔍 Checking JSON syntax…"
-          # -e returns exit code 0 on valid JSON, but prints nothing
           jq -e . accounts.json
 
       - name: Count records
