@@ -14,20 +14,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore accounts.json from secret
+        shell: bash
         run: |
           cat << 'EOF' > accounts.json
-${{ secrets.ACCOUNTS_JSON }}
-EOF
+          ${{ secrets.ACCOUNTS_JSON }}
+          EOF
 
       - name: Install jq
+        shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
 
       - name: Validate JSON with jq
-        run: jq . accounts.json
+        shell: bash
+        run: |
+          echo "Validating accounts.json…"
+          jq . accounts.json
 
       - name: Unmarshal & loop through records
+        shell: bash
         run: |
           COUNT=$(jq length accounts.json)
           echo "🔢 Found $COUNT records in accounts.json"
